@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informasi Negara</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        #hasil {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cari Informasi Negara</h1>
+    <form id="formNegara">
+        <label for="negara">Masukkan Nama Negara:</label>
+        <input type="text" id="negara" name="negara" required>
+        <button type="submit">Cari</button>
+    </form>
+    <div id="hasil"></div>
+
+    <script>
+        // Menangani submit form
+        document.getElementById('formNegara').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Mencegah halaman refresh
+
+            const namaNegara = document.getElementById('negara').value;
+            const apiUrl = `https://restcountries.com/v3.1/name/${namaNegara}`;
+
+            try {
+                // Panggil API menggunakan fetch
+                const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error('Negara tidak ditemukan!');
+
+                const data = await response.json();
+                const negara = data[0];
+
+                // Tampilkan hasil di halaman
+                document.getElementById('hasil').innerHTML = `
+                    <h3>${negara.name.common}</h3>
+                    <p><strong>Wilayah:</strong> ${negara.region}</p>
+                    <p><strong>Ibu Kota:</strong> ${negara.capital ? negara.capital[0] : 'Tidak Ada'}</p>
+                    <p><strong>Populasi:</strong> ${negara.population.toLocaleString()}</p>
+                    <p><strong>Luas:</strong> ${negara.area.toLocaleString()} km²</p>
+                    <img src="${negara.flags.png}" alt="Bendera ${negara.name.common}" width="200">
+                `;
+            } catch (error) {
+                document.getElementById('hasil').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>
